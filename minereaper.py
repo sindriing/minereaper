@@ -1,10 +1,15 @@
 import numpy as np 
 import pyautogui as pui
+import mss
+import mss.tools
+from PIL import Image
+
 width = 16
 height = 16 
 undiscovered = np.zeros((width, height), dtype=int)
 board =  np.full((width, height), fill_value=9, dtype=int)
 offset = 7
+screenRegion = {'top': 0, 'left': 0, 'width': pui.size()[0], 'height': pui.size()[1]}
 
 def locate_playing_field():
 	right, top = pui.locateCenterOnScreen('images/topRightCorner.png')
@@ -17,7 +22,7 @@ def start_game():
 		smiley = pui.locateCenterOnScreen('images/deadSmiley.png')
 	if smiley is None:
 		smiley = pui.locateCenterOnScreen('images/winSmiley.png')
-	if smiley is None: 
+	if smiley is None:
 		print('Can not start game!')
 		exit()
 	smiley = (smiley[0]//2, smiley[1]//2)
@@ -29,6 +34,10 @@ def start_game():
 	#These are the coordinates of the squares in the game
 	xLocs = [x*squareDelta+left for x in range(width)]
 	yLocs = [y*squareDelta+top for y in range(height)]
+
+	screenRegion['width'] = right+6
+	screenRegion['height'] = bot+6
+
 	return (xLocs, yLocs)
 
 def is_closed(x, y, screen):
@@ -55,7 +64,8 @@ def find_square_value(x, y, screen):
 	exit()
 
 def update_board(xLocs, yLocs):
-	screen = pui.screenshot()
+	screenshot = mss.mss().grab(screenRegion)
+	screen = Image.frombytes('RGB', screenshot.size, screenshot.rgb)
 
 	for i, x in enumerate(xLocs):
 		for j, y in enumerate(yLocs):
@@ -78,7 +88,6 @@ def get_surrounding(xi, yi):
 
 def open_squares(xLocs, yLocs):
 	activity = False
-	#pui.mouseUp(button='right')
 	for i, x in enumerate(xLocs):
 		for j, y in enumerate(yLocs):
 			if board[i][j] > 0 and board[i][j] < 9:
