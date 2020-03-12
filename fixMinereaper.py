@@ -4,33 +4,12 @@ import mss
 import mss.tools
 from PIL import Image
 
-#Set the difficulty of the game: easy, intermediate or hard
-# difficulty = 'beginner'
-# difficulty = 'intermediate'
-difficulty = 'intermediate'
-
-
 width = 16
-height = 16
+height = 16 
 undiscovered = np.zeros((width, height), dtype=int)
 board =  np.full((width, height), fill_value=9, dtype=int)
 offset = 7
 screenRegion = {'top': 0, 'left': 0, 'width': pui.size()[0], 'height': pui.size()[1]}
-screenshotcount = 0
-
-#because i'm lazy this actually runs faster if it is located closer to the top right corner
-
-def find_difficulty():
-	global width, height
-	if difficulty == 'beginner':
-		width = 9
-		height = 9
-	elif difficulty == 'intermediate':
-		width = 16
-		height = 16
-	elif difficulty == 'expert':
-		width = 30
-		height = 16
 
 def locate_playing_field():
 	right, top = pui.locateCenterOnScreen('images/topRightCorner.png')
@@ -38,7 +17,6 @@ def locate_playing_field():
 	return (left//2+offset, right//2-offset, top//2+offset, bot//2-offset)
 
 def start_game():
-	find_difficulty()
 	smiley = pui.locateCenterOnScreen('images/smiley.png')
 	if smiley is None:
 		smiley = pui.locateCenterOnScreen('images/deadSmiley.png')
@@ -63,6 +41,10 @@ def start_game():
 	return (xLocs, yLocs)
 
 def is_closed(x, y, screen):
+	# print('HERE!!!')
+	# print(int(x)*2, int(y)*2-18)
+	# print(type(x), type(y))
+	# print(screen.getpixel((int(x*2), int(y*2-18))))
 	return screen.getpixel((x*2, y*2-18))[0:3] == (255,255,255)
 
 def find_square_value(x, y, screen):
@@ -87,10 +69,7 @@ def find_square_value(x, y, screen):
 	exit()
 
 def update_board(xLocs, yLocs):
-	global screenshotcount
 	screenshot = mss.mss().grab(screenRegion)
-	print("Taking screenshot nr: ", screenshotcount)
-	screenshotcount+=1
 	screen = Image.frombytes('RGB', screenshot.size, screenshot.rgb)
 
 	for i, x in enumerate(xLocs):
@@ -168,5 +147,3 @@ def play_game():
 # import time
 play_game()
 print(board.T)
-
-

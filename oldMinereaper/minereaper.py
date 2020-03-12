@@ -1,36 +1,10 @@
 import numpy as np 
 import pyautogui as pui
-import mss
-import mss.tools
-from PIL import Image
-
-#Set the difficulty of the game: easy, intermediate or hard
-# difficulty = 'beginner'
-# difficulty = 'intermediate'
-difficulty = 'intermediate'
-
-
 width = 16
-height = 16
+height = 16 
 undiscovered = np.zeros((width, height), dtype=int)
 board =  np.full((width, height), fill_value=9, dtype=int)
 offset = 7
-screenRegion = {'top': 0, 'left': 0, 'width': pui.size()[0], 'height': pui.size()[1]}
-screenshotcount = 0
-
-#because i'm lazy this actually runs faster if it is located closer to the top right corner
-
-def find_difficulty():
-	global width, height
-	if difficulty == 'beginner':
-		width = 9
-		height = 9
-	elif difficulty == 'intermediate':
-		width = 16
-		height = 16
-	elif difficulty == 'expert':
-		width = 30
-		height = 16
 
 def locate_playing_field():
 	right, top = pui.locateCenterOnScreen('images/topRightCorner.png')
@@ -38,13 +12,12 @@ def locate_playing_field():
 	return (left//2+offset, right//2-offset, top//2+offset, bot//2-offset)
 
 def start_game():
-	find_difficulty()
 	smiley = pui.locateCenterOnScreen('images/smiley.png')
 	if smiley is None:
 		smiley = pui.locateCenterOnScreen('images/deadSmiley.png')
 	if smiley is None:
 		smiley = pui.locateCenterOnScreen('images/winSmiley.png')
-	if smiley is None:
+	if smiley is None: 
 		print('Can not start game!')
 		exit()
 	smiley = (smiley[0]//2, smiley[1]//2)
@@ -56,17 +29,12 @@ def start_game():
 	#These are the coordinates of the squares in the game
 	xLocs = [x*squareDelta+left for x in range(width)]
 	yLocs = [y*squareDelta+top for y in range(height)]
-
-	screenRegion['width'] = right+6
-	screenRegion['height'] = bot+6
-
 	return (xLocs, yLocs)
 
 def is_closed(x, y, screen):
 	return screen.getpixel((x*2, y*2-18))[0:3] == (255,255,255)
 
 def find_square_value(x, y, screen):
-	x,y = int(x), int(y)
 	if is_closed(x, y, screen): return 9 #9 represents a closed square
 	if screen.getpixel((x*2, y*2))[0:3] == (0  ,39 ,244): return 1
 	if screen.getpixel((x*2, y*2+3))[0:3] == (56 ,120,33 ): return 2
@@ -87,11 +55,7 @@ def find_square_value(x, y, screen):
 	exit()
 
 def update_board(xLocs, yLocs):
-	global screenshotcount
-	screenshot = mss.mss().grab(screenRegion)
-	print("Taking screenshot nr: ", screenshotcount)
-	screenshotcount+=1
-	screen = Image.frombytes('RGB', screenshot.size, screenshot.rgb)
+	screen = pui.screenshot()
 
 	for i, x in enumerate(xLocs):
 		for j, y in enumerate(yLocs):
@@ -114,6 +78,7 @@ def get_surrounding(xi, yi):
 
 def open_squares(xLocs, yLocs):
 	activity = False
+	#pui.mouseUp(button='right')
 	for i, x in enumerate(xLocs):
 		for j, y in enumerate(yLocs):
 			if board[i][j] > 0 and board[i][j] < 9:
