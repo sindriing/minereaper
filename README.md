@@ -7,4 +7,4 @@
   Requires Pillow, pyautogui and mss (and... well see Warning section)
 
 ## Warning
-  The code is **highly** screen and OS specific. I made this work on my *13 inch 2016 Macbook pro* which has a (2560 x 1600) display with double pixel density. A lot of the code has to be literally pixel perfect so this probably won't work out of the box on different displays/operating systems and making it compatible with multiple device types just sounds like a chore.
+  The code is **highly** screen and OS specific. I made this work on my *13 inch 2016 Macbook pro* which has a (2560 x 1600) display with double pixel density. A lot of the mouse movements need to be pixel perfect so this probably won't work out of the box on different displays/operating systems and making it compatible with multiple device types just sounds like a chore.
